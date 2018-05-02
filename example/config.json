@@ -1,0 +1,36 @@
+[
+    {
+        "file": {
+            "glob": "/home/jake/Desktop/mock_*",
+            "exampleDate": "20060102",
+            "timestampUnit": "ns",
+            "headers": true,
+            "delim": "|",
+            "columns": {
+                "ticker": 2,
+                "timestamp": 0,
+                "bid": 16,
+                "bidSize": 17,
+                "ask": 20,
+                "askSize": 21
+            }
+        },
+        "backtest": {
+            "startCashAmt": 1000000.00,
+            "ignoreSecurities": [],
+            "Slippage": 0.00,
+            "Commission": 0.00
+        },
+        "simulation": {
+            "startDate": "20170804",
+            "endDate": "20170805",
+            "barRate": 1,
+            "costmethod": 0,
+            "outputFormat": 0
+        },
+        "benchmark": {
+            "use": true,
+            "update": false
+        }
+    }
+]
