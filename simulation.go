@@ -9,8 +9,8 @@ import (
 
 // ReadConfig
 func ReadConfig(file *os.File) config.Config {
-	var conf = config.Config{}
+	var conf = &config.Config{}
 	decoder := json.NewDecoder(file)
-	decoder.Decode(&conf)
-	return conf
+	decoder.Decode(conf)
+	return *conf
 }

@@ -1,9 +1,7 @@
 package goat
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -11,12 +9,7 @@ import (
 )
 
 func TestReadConfig(t *testing.T) {
-	// SETUP
-	name, _ := filepath.Abs("../example/config.json")
-	fmt.Println(name)
-	file, _ := os.Open(name)
-	fmt.Println(file)
-	// END SETUP
+	file, _ := os.Open("/home/jake/go/src/github.com/jakeschurch/goat/example/config.json")
 
 	type args struct {
 		file *os.File
