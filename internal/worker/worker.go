@@ -13,17 +13,17 @@ import (
 	"github.com/jakeschurch/instruments"
 )
 
-type WorkerConfig struct {
-	Name, Bid, BidSz, Ask, AskSz, Timestamp uint
+type Config struct {
+	Name, Bid, BidSz, Ask, AskSz, Timestamp uint8
 	Timeunit                                string
 	Date                                    time.Time
 }
 type Worker struct {
 	dataChan chan []string
-	config   *WorkerConfig
+	config   Config
 }
 
-func NewWorker(wc *WorkerConfig) *Worker {
+func New(wc Config) *Worker {
 	return &Worker{
 		config: wc,
 	}

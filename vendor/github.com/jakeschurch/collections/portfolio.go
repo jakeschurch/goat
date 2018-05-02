@@ -53,3 +53,7 @@ func (p *Portfolio) Update(quote instruments.Quote) error {
 func (p *Portfolio) Remove(key string) error {
 	return p.Holdings.Remove(key)
 }
+
+func (p *Portfolio) GetSlice(key string) ([]*instruments.Holding, error) {
+	return p.Holdings.GetSlice(key)
+}

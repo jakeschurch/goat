@@ -65,8 +65,7 @@ func (o *Order) timestampTx() time.Time {
 
 // Transact a fulfillment of an order; yielding a new transaction struct.
 func (o *Order) Transact(price Price, volume Volume) *Transaction {
-	o.filled += volume
-	o.Volume -= volume
+	o.filled -= volume
 	return &Transaction{
 		Name:         o.Name,
 		Buy:          o.Buy,

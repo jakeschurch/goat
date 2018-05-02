@@ -9,8 +9,8 @@
     "internal/linkedlist/holdings",
     "internal/linkedlist/orders"
   ]
-  revision = "3d41e533152b5d8027a85bd38258cb76f9fc5b8e"
-  version = "v0.2.0"
+  revision = "09b6e5d0d8a85a5e7d6935c191fba1f42c51990e"
+  version = "v0.2.1"
 
 [[projects]]
   name = "github.com/jakeschurch/instruments"
