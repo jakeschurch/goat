@@ -1,6 +1,8 @@
 # [WIP] GOAT
 
-![GOATpher](docs/goatpher.png)
+<p align="center">
+  <img src="https://github.com/jakeschurch/goat/docs/goatpher.png" alt="The Goatpher"/>
+</p>
 
 [![GoDoc](https://godoc.org/github.com/jakeschurch/goat?status.svg)](https://godoc.org/github.com/jakeschurch/goat)[![Go Report Card](https://goreportcard.com/badge/github.com/jakeschurch/goat)](https://goreportcard.com/report/github.com/jakeschurch/goat)[![Build Status](https://travis-ci.org/jakeschurch/goat.svg?branch=master)](https://travis-ci.org/jakeschurch/goat)[![Coverage Status](https://coveralls.io/repos/github/jakeschurch/goat/badge.svg?branch=master)](https://coveralls.io/github/jakeschurch/goat?branch=master)
 
@@ -35,7 +37,7 @@ See also the list of [contributors](https://github.com/jakeschurch/goat/contribu
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 
