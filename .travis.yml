@@ -10,6 +10,9 @@ go:
   - tip
 
 before_install:
-  - go get github.com/mattn/goveralls
+  - go get github.com/mattn/goveralls  
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+install:
+  - dep ensure
 script:
   - $GOPATH/bin/goveralls -service=travis-ci
