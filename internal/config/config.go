@@ -1,6 +1,9 @@
 package config
 
 import (
+	"log"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -42,4 +45,21 @@ type Config struct {
 		Use    bool `json:"use"`
 		Update bool `json:"update"`
 	} `json:"benchmark"`
+}
+
+func (c Config) FileInfo() (string, time.Time) {
+	fileGlob, err := filepath.Glob(c.File.Glob)
+	if err != nil || len(fileGlob) == 0 {
+		log.Println(err)
+		return "", time.Time{}
+	}
+	filename := fileGlob[0]
+	lastUnderscore := strings.LastIndex(filename, "_")
+	fileDate := filename[lastUnderscore+1:]
+
+	lastDate, dateErr := time.Parse(c.File.ExampleDate, fileDate)
+	if dateErr != nil {
+		log.Fatal("Date cannot be parsed")
+	}
+	return filename, lastDate
 }
