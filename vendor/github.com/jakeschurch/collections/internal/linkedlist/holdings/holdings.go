@@ -79,7 +79,7 @@ func (n *items) grow(i uint32) {
 
 // Holdings is a collection that stores a cache and list.
 type Holdings struct {
-	sync.Mutex
+	sync.RWMutex
 	cache *cache.Cache
 	*items
 }
@@ -90,6 +90,10 @@ func New() *Holdings {
 		cache: cache.New(),
 		items: newItems(),
 	}
+}
+
+func (h *Holdings) Keys() map[string]uint32 {
+	return h.cache.Map()
 }
 
 // Get returns a list associated with a key from Holdings.list.
@@ -151,4 +155,31 @@ func (h *Holdings) Update(quote instruments.Quote) error {
 	h.data[i].UpdateMetrics(quote.Bid.Price, quote.Ask.Price, quote.Timestamp)
 	h.Unlock()
 	return nil
+}
+func (h *Holdings) GetSlice(key string) ([]*instruments.Holding, error) {
+	var i uint32
+	var err error
+	var nodes *list
+	var holdings = make([]*instruments.Holding, 0)
+
+	h.RLock()
+	// Query cache to see if we hold Orders with same key.
+	// If not return error.
+	if i, err = h.cache.Get(key); err != nil {
+		h.RUnlock()
+		return holdings, err
+	}
+	// Query items list to return linked list of nodes.
+	// Return error if i outside of last index.
+	if nodes, err = h.items.get(i); err != nil {
+		h.RUnlock()
+		return holdings, err
+	}
+	for x := nodes.head.next; x != nil; x = x.next {
+		if x.Holding != nil {
+			holdings = append(holdings, x.Holding)
+		}
+	}
+	h.RUnlock()
+	return holdings, nil
 }

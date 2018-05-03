@@ -29,6 +29,14 @@ import (
 // Amount is the representation of a Volume and an Amount.
 type Amount int
 
+func (amt Amount) ToPercent() string {
+	var str, end []byte
+	str = []byte(strconv.Itoa(int(amt)))
+	str, end = str[0:len(str)-2], str[len(str)-2:]
+
+	return toString(str) + "." + string(end) + "%"
+}
+
 // Volume represents a quantity or volume.
 type Volume int
 

@@ -9,8 +9,8 @@
     "internal/linkedlist/holdings",
     "internal/linkedlist/orders"
   ]
-  revision = "3d41e533152b5d8027a85bd38258cb76f9fc5b8e"
-  version = "v0.2.0"
+  revision = "6b3ffa82b86cb7b4793c53bf3f7d7ea1cea3d7cd"
+  version = "v0.2.1"
 
 [[projects]]
   name = "github.com/jakeschurch/instruments"
@@ -18,8 +18,8 @@
     ".",
     "internal/ordering"
   ]
-  revision = "2572a0316178ec940b0418bd2e685956cdf4e7bf"
-  version = "v1.0.6"
+  revision = "d6b7cb1f043f021f523323a7af8a6c494cd6bca5"
+  version = "v1.0.7"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -30,6 +30,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ba79403f5f0bfe1b49dec2cdd968efaaa0146dd13d13d8e6c66059737c2ceb86"
+  inputs-digest = "a22bd23c622fe7ef77be65c5867f0a47d09898d4d63899f6df2e7c0a82806a7c"
   solver-name = "gps-cdcl"
   solver-version = 1
