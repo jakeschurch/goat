@@ -21,6 +21,13 @@
 package output
 
 import (
+	"encoding/csv"
+	"encoding/json"
+	"io"
+	"log"
+	"os"
+	"time"
+
 	"github.com/jakeschurch/collections"
 	"github.com/jakeschurch/instruments"
 )
@@ -43,7 +50,53 @@ func (plog *PerformanceLog) AddHoldings(holdings ...*instruments.Holding) {
 	}
 }
 
+func (plog *PerformanceLog) OutputResults(format Format, pathName string) {
+	var holdingResults = make([][]string, 0)
+
+	for key, _ := range plog.holdings.Holdings.Keys() {
+		holdingSlice, _ := plog.holdings.GetSlice(key)
+		holdingResults = append(holdingResults, NewHoldingSummary(holdingSlice...).ToSlice())
+	}
+	switch format {
+	case JSON:
+		ToJSON(holdingResults, pathName)
+	default:
+		ToCSV(holdingResults, pathName)
+	}
+}
+
 // ----------------------------------------------------------------------------
+
+func ToCSV(data [][]string, pathName string) {
+	data = append([][]string{GetHeaders()}, data...)
+
+	var file, err = os.Create(pathName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	w := csv.NewWriter(file)
+	for _, row := range data {
+		w.Write(row)
+	}
+	w.Flush()
+	file.Close()
+}
+
+func ToJSON(data [][]string, pathName string) {
+	var file, err = os.Create(pathName)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	w := io.Writer(file)
+	marshalled, err := json.Marshal(data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	w.Write(marshalled)
+	file.Close()
+}
 
 type Format uint
 
@@ -53,6 +106,7 @@ const (
 )
 
 type holdingSummary struct {
+	Name           string
 	AvgVolume      instruments.Volume   `json:"AvgVolume,omitempty"`
 	AvgAsk         instruments.Price    `json:"AvgAsk,omitempty"`
 	AvgBid         instruments.Price    `json:"AvgBid,omitempty"`
@@ -65,8 +119,48 @@ type holdingSummary struct {
 	Alpha          instruments.Amount   `json:"alpha,omitempty"`
 }
 
+func (hs *holdingSummary) ToSlice() []string {
+	return []string{
+		hs.Name,
+		hs.AvgVolume.String(),
+		hs.AvgAsk.String(),
+		hs.AvgBid.String(),
+		hs.MaxAsk.Price.String(),
+		hs.MaxAsk.Date.Format(time.RFC1123),
+		hs.MinAsk.Price.String(),
+		hs.MinAsk.Date.Format(time.RFC1123),
+		hs.MaxBid.Price.String(),
+		hs.MaxBid.Date.Format(time.RFC1123),
+		hs.MinBid.Price.String(),
+		hs.MinBid.Date.Format(time.RFC1123),
+		string(hs.NumOrderFilled),
+		hs.PctReturn.ToPercent(),
+		hs.Alpha.ToPercent(),
+	}
+}
+func GetHeaders() []string {
+	return []string{
+		"Name",
+		"Avg. Volume",
+		"Avg. Ask Price",
+		"Avg. Bid Price",
+		"Max. Ask Price",
+		"Max. Ask Date",
+		"Min. Ask Price",
+		"Min. Ask Date",
+		"Max. Bid Price",
+		"Max. Bid Date",
+		"Min. Bid Price",
+		"Min. Bid Date",
+		"Number of Orders Filled",
+		"Percent Return",
+		"Alpha",
+	}
+}
+
 func (hs *holdingSummary) update(h *instruments.Holding) {
 	if hs.NumOrderFilled == 0 {
+		hs.Name = h.Name
 		hs.AvgVolume = h.Volume
 		hs.AvgAsk = h.Buy.Price
 		hs.AvgBid = h.Sell.Price

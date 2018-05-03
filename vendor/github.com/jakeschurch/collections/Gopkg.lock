@@ -7,8 +7,8 @@
     ".",
     "internal/ordering"
   ]
-  revision = "2572a0316178ec940b0418bd2e685956cdf4e7bf"
-  version = "v1.0.6"
+  revision = "d6b7cb1f043f021f523323a7af8a6c494cd6bca5"
+  version = "v1.0.7"
 
 [[projects]]
   name = "github.com/pkg/errors"

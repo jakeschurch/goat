@@ -92,6 +92,10 @@ func New() *Holdings {
 	}
 }
 
+func (h *Holdings) Keys() map[string]uint32 {
+	return h.cache.Map()
+}
+
 // Get returns a list associated with a key from Holdings.list.
 // If none are associated with specific key, return nil.
 func (h *Holdings) Get(key string) (*list, error) {

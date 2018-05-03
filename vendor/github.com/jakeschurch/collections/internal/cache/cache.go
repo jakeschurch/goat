@@ -58,11 +58,9 @@ func (k keyIndex) insertAndSort(n uint32) (keyIndex, error) {
 	return k, nil
 }
 
-type keyMap map[string]uint32
-
 type Cache struct {
 	sync.RWMutex
-	items     keyMap
+	items     map[string]uint32
 	openSlots keyIndex
 	n         uint32
 }
@@ -70,10 +68,14 @@ type Cache struct {
 // NewCache creates a new Cache.
 func New() *Cache {
 	return &Cache{
-		items:     make(keyMap),
+		items:     make(map[string]uint32),
 		openSlots: make(keyIndex, 0),
 		n:         0,
 	}
+}
+
+func (c *Cache) Map() map[string]uint32 {
+	return c.items
 }
 
 // Put records the value of a key-index pair in a Cache's openSlots map.
