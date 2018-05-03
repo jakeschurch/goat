@@ -41,6 +41,27 @@ func NewPortfolio(cash instruments.Amount) *Portfolio {
 	}
 }
 
+func (p *Portfolio) Update(quote instruments.Quote, algos ...Algorithm) {
+	p.Holdings.Update(quote)
+	if orders, err := p.checkSells(quote, algos...); err == nil {
+		for i := range orders {
+			orderManager.Add(orders[i])
+		}
+	}
+}
+
+// CloseAll Open Holdings in Portfolio instance.
+func (p *Portfolio) CloseAll() error {
+	for k, _ := range p.Holdings.Keys() {
+		var list, err = p.Holdings.Get(k)
+		if err != nil {
+			return err
+		}
+		orderManager.Add(instruments.NewOrder(list.Name, false, instruments.Market, list.LastAsk.Price, list.Volume, list.LastAsk.Date))
+	}
+	return nil
+}
+
 // checkSells to see if we can create an orders.
 // if holdings are empty GetSlice will return error.
 func (p *Portfolio) checkSells(quote instruments.Quote, algos ...Algorithm) ([]*instruments.Order, error) {
