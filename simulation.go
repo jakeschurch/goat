@@ -25,10 +25,25 @@ import (
 	"os"
 	"sync"
 
+	"github.com/jakeschurch/goat/internal/output"
+
 	"github.com/jakeschurch/goat/internal/config"
 	"github.com/jakeschurch/goat/internal/worker"
 	"github.com/jakeschurch/instruments"
 )
+
+var (
+	orderManager   *OrderManager
+	Port           *Portfolio
+	performanceLog *output.PerformanceLog
+	// benchmark      *Benchmark
+)
+
+func init() {
+	orderManager = NewOrderManager()
+	Port = NewPortfolio(instruments.Amount(0))
+	performanceLog = output.NewPerformanceLog()
+}
 
 // ReadConfig
 func ReadConfig(filename string) config.Config {
@@ -55,6 +70,7 @@ func NewSim(c config.Config, algos ...Algorithm) *Simulation {
 	for _, name := range c.Backtest.IgnoreSecurities {
 		sim.ignore.Store(name, struct{}{})
 	}
+	Port.cash += instruments.NewAmount(instruments.NewPrice(1.00), instruments.NewVolume(c.Backtest.StartCashAmt))
 	return sim
 }
 
@@ -62,9 +78,6 @@ func NewSim(c config.Config, algos ...Algorithm) *Simulation {
 // Buy Orders handled by Simulation;
 // sells by Portfolios.
 func (sim *Simulation) checkBuys(quote instruments.Quote) *instruments.Order {
-	if _, ok := sim.ignore.Load(quote.Name); ok {
-		return nil
-	}
 	for _, algo := range sim.algos {
 		if order, ok := algo.Buy(quote); ok {
 			return order
@@ -93,6 +106,7 @@ func (sim *Simulation) Run() error {
 
 	quoteChan := make(chan *instruments.Quote)
 	done := make(chan struct{})
+
 	go func(inChan <-chan *instruments.Quote) {
 		var quote *instruments.Quote
 		var ok bool
@@ -102,7 +116,9 @@ func (sim *Simulation) Run() error {
 				break loop
 			}
 			if quote != nil {
-				sim.process(quote)
+				if _, ok := sim.ignore.Load(quote.Name); !ok {
+					sim.process(quote)
+				}
 			}
 			continue
 		}
@@ -112,11 +128,18 @@ func (sim *Simulation) Run() error {
 	if file, err = os.Open(fname); err != nil {
 		return err
 	}
-	worker.Run(quoteChan, file)
+	go worker.Run(quoteChan, file)
 	<-done
+
+	Port.CloseAll()
+	performanceLog.OutputResults(output.CSV, "/home/jake/Desktop/simResults.csv")
 	return nil
 }
 
 func (sim *Simulation) process(quote *instruments.Quote) {
-
+	// Check if we can buy new holding
+	if newBuy := sim.checkBuys(*quote); newBuy != nil {
+		orderManager.Add(newBuy)
+	}
+	Port.Update(*quote, sim.algos...)
 }

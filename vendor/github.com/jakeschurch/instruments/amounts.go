@@ -29,6 +29,9 @@ import (
 // Amount is the representation of a Volume and an Amount.
 type Amount int
 
+func NewAmount(price Price, volume Volume) Amount {
+	return Amount(price * Price(volume))
+}
 func (amt Amount) ToPercent() string {
 	var str, end []byte
 	str = []byte(strconv.Itoa(int(amt)))
