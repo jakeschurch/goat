@@ -145,5 +145,6 @@ func (worker *Worker) consume(record []string) (*instruments.Quote, error) {
 		return quote, ErrParseRecord
 	}
 	quote.Timestamp = worker.config.Date.Add(tickDuration)
+
 	return quote, nil
 }

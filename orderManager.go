@@ -40,6 +40,12 @@ func NewOrderManager() *OrderManager {
 }
 
 func (o *OrderManager) Add(order *instruments.Order) {
+	switch order.Buy {
+	case true:
+		o.Buy(order, Port)
+	case false:
+		o.Sell(order, Port)
+	}
 	o.Insert(order)
 }
 
@@ -81,7 +87,8 @@ func (o *OrderManager) Sell(order *instruments.Order, port *Portfolio) ([]*instr
 		}
 
 		// Apply transaction logic to x's Holding.
-		x.Holding.SellOff(*tx)
+		holding, _ := x.Holding.SellOff(*tx)
+		performanceLog.AddHoldings(holding)
 
 		// Append new tx to TXs slice.
 		TXs = append(TXs, tx)
@@ -120,6 +127,6 @@ func (o *OrderManager) Buy(order *instruments.Order, port *Portfolio) ([]*instru
 	port.Insert(*h)
 	// Append new tx to TXs slice.
 	TXs = append(TXs, tx)
-
+	performanceLog.AddOrders(order)
 	return TXs, nil
 }

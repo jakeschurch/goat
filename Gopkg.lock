@@ -18,7 +18,7 @@
     ".",
     "internal/ordering"
   ]
-  revision = "d6b7cb1f043f021f523323a7af8a6c494cd6bca5"
+  revision = "70ce9ab60f3ddd847ec10c0ae8d8fae5645a95ac"
   version = "v1.0.7"
 
 [[projects]]

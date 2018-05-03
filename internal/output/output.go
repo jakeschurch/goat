@@ -38,6 +38,12 @@ type PerformanceLog struct {
 	holdings *collections.Portfolio
 }
 
+func NewPerformanceLog() *PerformanceLog {
+	return &PerformanceLog{
+		orders:   collections.NewOrderBook(),
+		holdings: collections.NewPortfolio(),
+	}
+}
 func (plog *PerformanceLog) AddOrders(orders ...*instruments.Order) {
 	for i := range orders {
 		plog.orders.Insert(orders[i])
