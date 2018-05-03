@@ -27,11 +27,11 @@
 
 [[constraint]]
   name = "github.com/jakeschurch/collections"
-  version = "0.2.0"
+  version = "0.2.1"
 
 [[constraint]]
   name = "github.com/jakeschurch/instruments"
-  version = "1.0.6"
+  version = "1.0.7"
 
 [prune]
   go-tests = true

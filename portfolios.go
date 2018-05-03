@@ -12,48 +12,63 @@
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR k PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 // AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package collections
+package goat
 
 import (
+	"sync"
+
 	"github.com/jakeschurch/instruments"
 
-	"github.com/jakeschurch/collections/internal/linkedlist/holdings"
+	"github.com/jakeschurch/collections"
 )
 
 type Portfolio struct {
-	Holdings *holdings.Holdings
+	*collections.Portfolio
+	cash instruments.Amount
+	sync.RWMutex
 }
 
-// NewPortfolio constructs a new Portfolio instance.
-func NewPortfolio() *Portfolio {
+func NewPortfolio(cash instruments.Amount) *Portfolio {
 	return &Portfolio{
-		Holdings: holdings.New(),
+		Portfolio: collections.NewPortfolio(),
+		cash:      cash,
 	}
 }
 
-// Insert a new holding into a portfolio instance.
-func (p *Portfolio) Insert(holding instruments.Holding) {
-	p.Holdings.Insert(holding)
+// checkSells to see if we can create an orders.
+// if holdings are empty GetSlice will return error.
+func (p *Portfolio) checkSells(quote instruments.Quote, algos ...Algorithm) ([]*instruments.Order, error) {
+	var sells = make([]*instruments.Order, 0)
+	var holdings, err = p.GetSlice(quote.Name)
+	if err != nil {
+		return sells, err
+	}
+
+	var i, j = 0, 0
+	for j <= len(algos) {
+		if order, ok := algos[j].Sell(quote, holdings[i]); ok {
+			sells = append(sells, order)
+		}
+		if i < len(holdings) {
+			i++
+		}
+		if j < len(algos) {
+			j++
+			i = 0
+		} else {
+			break
+		}
+	}
+	return sells, nil
 }
 
-// Update aggregate holding data from quoted data.
-// Returns error if associated instrument not held,
-// otherwise returns nil.
-func (p *Portfolio) Update(quote instruments.Quote) error {
-	return p.Holdings.Update(quote)
-}
-
-// Remove a set of holdings from a portfolio.
-func (p *Portfolio) Remove(key string) error {
-	return p.Holdings.Remove(key)
-}
-
-func (p *Portfolio) GetSlice(key string) ([]*instruments.Holding, error) {
-	return p.Holdings.GetSlice(key)
+type Benchmark struct {
+	*collections.Portfolio
+	sync.RWMutex
 }
