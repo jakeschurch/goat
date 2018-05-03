@@ -35,7 +35,7 @@ var (
 // Quote reflects a static state of a security.
 type Quote struct {
 	Name      string
-	Bid, Ask  *quotedMetric
+	Bid, Ask  *QuotedMetric
 	Timestamp time.Time
 }
 
@@ -62,18 +62,18 @@ func (q *Quote) TotalBid() (Amount, error) {
 
 // ----------------------------------------------------------------------------
 
-// A quotedMetric is a representation of a Price with an associated Volume.
-type quotedMetric struct {
+// A QuotedMetric is a representation of a Price with an associated Volume.
+type QuotedMetric struct {
 	Price
 	Volume
 }
 
-func NewQuotedMetric(price, volume float64) *quotedMetric {
-	return &quotedMetric{Price: NewPrice(price), Volume: NewVolume(volume)}
+func NewQuotedMetric(price, volume float64) *QuotedMetric {
+	return &QuotedMetric{Price: NewPrice(price), Volume: NewVolume(volume)}
 }
 
 // Total returns the product of a Price and a Volume.
-func (q *quotedMetric) Total() (a Amount, err error) {
+func (q *QuotedMetric) Total() (a Amount, err error) {
 	if a = Amount(q.Price * Price(q.Volume)); a == 0 {
 		return 0, ErrZeroValue
 	}

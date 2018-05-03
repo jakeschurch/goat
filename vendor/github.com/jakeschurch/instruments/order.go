@@ -30,7 +30,7 @@ import (
 // Order stores logic for transacting a stock.
 type Order struct {
 	Name string
-	quotedMetric
+	QuotedMetric
 	filled Volume
 
 	Buy       bool
@@ -49,7 +49,7 @@ func NewOrder(name string, buy bool, logic Logic, price Price, volume Volume, ti
 	return &Order{
 		Name:         name,
 		Buy:          buy,
-		quotedMetric: quotedMetric{Price: price, Volume: volume},
+		QuotedMetric: QuotedMetric{Price: price, Volume: volume},
 		Logic:        logic,
 		Status:       Open,
 		timestamp:    timestamp,
@@ -69,7 +69,7 @@ func (o *Order) Transact(price Price, volume Volume) *Transaction {
 	return &Transaction{
 		Name:         o.Name,
 		Buy:          o.Buy,
-		quotedMetric: quotedMetric{price, volume},
+		QuotedMetric: QuotedMetric{price, volume},
 		Timestamp:    o.timestampTx(),
 	}
 }
@@ -80,7 +80,7 @@ func (o *Order) Transact(price Price, volume Volume) *Transaction {
 type Transaction struct {
 	Name string
 	Buy  bool
-	quotedMetric
+	QuotedMetric
 	Timestamp time.Time
 }
 
