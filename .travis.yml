@@ -11,8 +11,8 @@ go:
 
 before_install:
   - go get github.com/mattn/goveralls  
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - go get -u golang.org/x/vgo
 install:
-  - dep ensure
+  - cd $GOPATH/src/github.com/jakeschurch/goat | vgo build
 script:
   - $GOPATH/bin/goveralls -service=travis-ci
