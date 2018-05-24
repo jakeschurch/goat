@@ -114,7 +114,7 @@ func TestWorker_consume(t *testing.T) {
 
 func TestWorker_Produce(t *testing.T) {
 	// SETUP
-	var file, _ = os.Open("././example/mockedQuoteData")
+	var file, _ = os.Open("../../example/mockedQuoteData")
 	var w = New(mockConfig())
 	var i = 0
 	var wg = sync.WaitGroup{}
