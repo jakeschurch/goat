@@ -21,19 +21,26 @@
 package worker
 
 import (
-	"io"
+	"fmt"
 	"os"
 	"reflect"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/jakeschurch/goat/internal/config"
-
 	"github.com/jakeschurch/instruments"
 )
 
+func mockConfig() Config {
+	return Config{
+		Timestamp: 0, Name: 1, Bid: 2, BidSz: 3, Ask: 4, AskSz: 5,
+		Timeunit: "ns", Date: time.Date(2017, time.August, 14, 0, 0, 0, 0, time.UTC),
+	}
+}
+
 func mockWc() Config {
-	conf := config.ReadConfig("../../example/config.json")
+	conf := config.ReadConfig("././example/config.json")
 	var _, date, _ = conf.FileInfo()
 
 	// Setup Worker & WorkerConfig
@@ -45,74 +52,35 @@ func mockWc() Config {
 		Timeunit: conf.File.TimestampUnit,
 	}
 }
+
+func testConfigEquality(t1, t2 *Worker) bool {
+	if t1.config.Timestamp != t2.config.Timestamp ||
+		t1.config.Name != t2.config.Name ||
+		t1.config.Bid != t2.config.Bid ||
+		t1.config.BidSz != t2.config.BidSz ||
+		t1.config.Ask != t2.config.Ask ||
+		t1.config.AskSz != t2.config.AskSz {
+		return false
+	}
+	return true
+}
+
 func TestNew(t *testing.T) {
 	type args struct {
-		wc Config
+		c Config
 	}
 	tests := []struct {
 		name string
 		args args
 		want *Worker
 	}{
-		{"base case", args{mockWc()}, New(mockWc())},
+		{"base case", args{mockConfig()}, New(mockConfig())},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.wc); !reflect.DeepEqual(got, tt.want) {
+			if got := New(tt.args.c); !testConfigEquality(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
-		})
-	}
-}
-
-func TestWorker_Run(t *testing.T) {
-	quoteChan := make(chan *instruments.Quote)
-	done := make(chan struct{})
-
-	go func() {
-		for {
-			if _, ok := <-quoteChan; !ok {
-				break
-			}
-		}
-		close(done)
-	}()
-
-	file, _ := os.Open("../../example/config.json")
-	type args struct {
-		outChan chan<- *instruments.Quote
-		r       io.ReadSeeker
-	}
-	tests := []struct {
-		name   string
-		worker *Worker
-		args   args
-	}{
-		{"base case", New(mockWc()), args{quoteChan, file}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.worker.Run(tt.args.outChan, tt.args.r)
-			<-done
-		})
-	}
-}
-
-func TestWorker_produce(t *testing.T) {
-	type args struct {
-		r  io.ReadSeeker
-		wg *sync.WaitGroup
-	}
-	tests := []struct {
-		name   string
-		worker *Worker
-		args   args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			tt.worker.produce(tt.args.r, tt.args.wg)
 		})
 	}
 }
@@ -141,5 +109,34 @@ func TestWorker_consume(t *testing.T) {
 				t.Errorf("Worker.consume() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestWorker_Produce(t *testing.T) {
+	// SETUP
+	var file, _ = os.Open("../../example/mockedQuoteData")
+	var w = New(mockConfig())
+	var i = 0
+	var wg = sync.WaitGroup{}
+	// END SETUP
+	wg.Add(1)
+
+	go func(ch <-chan *instruments.Quote) {
+		for {
+			if elem, ok := <-ch; ok {
+				fmt.Println(elem)
+				i++
+			} else {
+				break
+			}
+		}
+		wg.Done()
+	}(w.DataChan)
+
+	go w.Produce(file, true)
+
+	wg.Wait()
+	if i != 1 {
+		t.Error()
 	}
 }
