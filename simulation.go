@@ -104,31 +104,33 @@ func (sim *Simulation) Run() error {
 	}
 	worker := worker.New(wc)
 
-	quoteChan := make(chan *instruments.Quote)
-	done := make(chan struct{})
-
-	go func(inChan <-chan *instruments.Quote) {
-		var quote *instruments.Quote
-		var ok bool
-	loop:
-		for {
-			if quote, ok = <-quoteChan; !ok {
-				break loop
-			}
-			if quote != nil {
-				if _, ok := sim.ignore.Load(quote.Name); !ok {
-					sim.process(quote)
-				}
-			}
-			continue
-		}
-		close(done)
-	}(quoteChan)
-
 	if file, err = os.Open(fname); err != nil {
 		return err
 	}
-	go worker.Run(quoteChan, file)
+	go worker.Produce(file, true)
+
+	var wg = sync.WaitGroup{}
+
+	wg.Add(1)
+
+	var done = make(chan struct{})
+
+	go func(ch <-chan *instruments.Quote) {
+		for {
+			if elem, ok := <-ch; ok {
+				if _, ok := sim.ignore.Load(elem.Name); !ok {
+					sim.process(elem)
+				}
+			} else {
+				break
+			}
+		}
+		wg.Done()
+	}(worker.DataChan)
+
+	go worker.Produce(file, true)
+
+	wg.Wait()
 	<-done
 
 	Port.CloseAll()
