@@ -11,7 +11,7 @@ go:
 
 before_install:
   - go get github.com/mattn/goveralls  
-  - go get -u golang.org/x/vgo
+  - go get golang.org/x/vgo
 install:
   - cd $GOPATH/src/github.com/jakeschurch/goat | vgo build
 script:

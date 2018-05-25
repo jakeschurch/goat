@@ -23,11 +23,14 @@ See [API documentation](https://godoc.org/github.com/jakeschurch/goat) for packa
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Accepting contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/jakeschurch/goat/tags).
+
+## Change Log
+We generage our [change log](CHANGELOG.md) using [github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator).  
 
 ## Authors
 
