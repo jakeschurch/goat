@@ -107,7 +107,6 @@ func (sim *Simulation) Run() error {
 	if file, err = os.Open(fname); err != nil {
 		return err
 	}
-	go worker.Produce(file, true)
 
 	var wg = sync.WaitGroup{}
 
